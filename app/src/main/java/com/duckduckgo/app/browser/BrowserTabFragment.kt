@@ -168,6 +168,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureBannerNotification()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
+        configureButtonToKeyboard()
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
@@ -349,8 +350,15 @@ class BrowserTabFragment : Fragment(), FindListener {
         renderPopupMenu(viewState)
 
         when (viewState.isEditing) {
-            true -> omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
-            false -> omniBarContainer.background = null
+            true -> {
+                omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
+                buttonToKeyboard.hide()
+
+            }
+            false -> {
+                omniBarContainer.background = null
+                buttonToKeyboard.show()
+            }
         }
 
         when (viewState.autoComplete.showSuggestions) {
@@ -511,6 +519,17 @@ class BrowserTabFragment : Fragment(), FindListener {
         nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
         closeFindInPagePanel.setOnClickListener {
             viewModel.dismissFindInView()
+        }
+    }
+
+    private fun configureButtonToKeyboard() {
+        buttonToKeyboard.setOnClickListener {
+            omnibarTextInput.showKeyboard()
+        }
+        buttonToKeyboard.setOnLongClickListener {
+            buttonToKeyboard.hide()
+            buttonToKeyboard.postDelayed({buttonToKeyboard.show()}, 3000)
+            true
         }
     }
 
